@@ -31563,7 +31563,7 @@ async function generateConciseSummary(originalText) {
     }
 
     // 核心Prompt：指示AI将内容精简为一句话
-    const systemPrompt = `请你将以下内容精简为一句话的核心摘要，保留最关键的人物、事件和结论，字数控制在20字以内：\n\n--- 内容开始 ---\n${originalText}\n--- 内容结束 ---`;
+    const systemPrompt = `请你将以下内容精简为核心摘要，保留最关键的人物、事件和结论，字数控制在二百字以内：\n\n--- 内容开始 ---\n${originalText}\n--- 内容结束 ---`;
 
     try {
         const response = await fetch(`${proxyUrl}/v1/chat/completions`, {
