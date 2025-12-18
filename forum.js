@@ -372,40 +372,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- 2c. 拼接单条评论的完整HTML ---
         commentsHtml += `
-                <div class="post-comment-item" data-commenter-name="${comment.author}">
-                    <img src="${commenterAvatarUrl}" class="comment-avatar-small">
-                    <div class="comment-details">
-                        <div class="comment-header-line">
-                            <span class="comment-author">${comment.author}</span>
-                            <span class="comment-floor">${index + 1}楼</span>
-                        </div>
-                        <div class="comment-content">
-                            ${replyHtml}
-                            <span class="comment-text">${(comment.content || '').replace(/\n/g, '<br>')}</span>
-                        </div>
-                    </div>
+        <div class="post-comment-item" data-commenter-name="${comment.author}">
+            <img src="${commenterAvatarUrl}" class="comment-avatar-small">
+            <div class="comment-details">
+                <div class="comment-header-line">
+                    <span class="comment-author">${comment.author}</span>
+                    <span class="comment-floor">${index + 1}楼</span>
                 </div>
-            `;
+                <div class="comment-content">
+                    ${replyHtml}
+                    <span class="comment-text">${(comment.content || '').replace(/\n/g, '<br>')}</span>
+                </div>
+            </div>
+            <!-- ★ 新增：删除按钮 (利用 comment.id) -->
+            <span class="forum-comment-delete-btn" data-id="${comment.id}">×</span>
+        </div>
+    `;
       });
     } else {
       commentsHtml += '<p style="color: var(--text-secondary); font-size: 14px;">还没有评论，快来抢沙发！</p>';
     }
     commentsHtml += '</div>';
-
-    // --- 3. 拼接帖子详情页的完整HTML ---
+    // --- 3. 拼接帖子详情页的完整HTML (已修改布局) ---
     contentEl.innerHTML = `
         <div class="post-detail-header">
-            <img src="${authorAvatarUrl}" class="post-author-avatar">
-            <div class="post-author-info">
-                <h1>${post.title}</h1>
-                <div class="post-detail-meta">
-                    <span>作者: ${post.author}</span> | <span>发布于: ${new Date(
-      post.timestamp,
-    ).toLocaleString()}</span>
+            <!-- 1. 标题单独一行 -->
+            <h1 class="post-main-title">${post.title}</h1>
+            
+            <!-- 2. 头像和元数据放在一起 -->
+            <div class="post-user-info-row">
+                <img src="${authorAvatarUrl}" class="post-author-avatar">
+                <div class="post-detail-meta-group">
+                    <span class="post-author-name">${post.author}</span>
+                    <span class="post-publish-time">${new Date(post.timestamp).toLocaleString()}</span>
                 </div>
             </div>
         </div>
+        
         <div class="post-detail-body">${post.content.replace(/\n/g, '<br>')}</div>
+        
         <div class="generate-comments-container">
             <button id="generate-forum-comments-btn">✨ 生成评论</button>
         </div>
@@ -999,7 +1004,7 @@ ${lengthInstruction}
     // 5. 给出成功提示。
     alert('帖子发布成功！');
   }
-
+  window.handleCreateForumPost = handleCreateForumPost;
   /**
    * 删除一个小组及其所有内容
    */
@@ -1800,13 +1805,40 @@ ${JSON.stringify(publicFigures, null, 2)}
     // 【核心修改】我们不再弹窗提示，而是调用一个新函数来打开真正的发帖窗口
     openCreateForumPostModal();
   });
-  // ▲▲▲ 替换结束 ▲▲▲
-  // ▼▼▼ 在 init() 的事件监听器区域，粘贴下面这块【新代码】 ▼▼▼
-
-  // 使用事件委托，为帖子详情页的“生成评论”按钮绑定事件
-  document.getElementById('post-detail-content').addEventListener('click', e => {
+  // 使用事件委托，为帖子详情页的“生成评论”按钮 和 “删除评论”按钮 绑定事件
+  document.getElementById('post-detail-content').addEventListener('click', async e => {
+    // 1. 处理生成评论
     if (e.target.id === 'generate-forum-comments-btn') {
       generateForumComments();
+      return;
+    }
+
+    // 2. ★ 新增：处理删除评论
+    if (e.target.classList.contains('forum-comment-delete-btn')) {
+      e.stopPropagation(); // 阻止冒泡，防止触发回复功能
+      const commentId = parseInt(e.target.dataset.id);
+
+      if (isNaN(commentId)) return;
+
+      // 弹出确认框
+      const confirmed = await showCustomConfirm('删除评论', '确定要删除这条评论吗？', {
+        confirmButtonClass: 'btn-danger',
+      });
+
+      if (confirmed) {
+        try {
+          await db.forumComments.delete(commentId);
+          // 刷新当前帖子详情页
+          if (activeForumPostId) {
+            await renderPostDetails(activeForumPostId);
+          }
+          // (可选) 如果你希望删除评论后列表页的评论数也刷新，可以解开下面这行
+          // if (activeGroupId) await renderGroupPosts(activeGroupId);
+        } catch (error) {
+          console.error('删除失败', error);
+          alert('删除失败: ' + error.message);
+        }
+      }
     }
   });
 
