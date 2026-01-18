@@ -16107,7 +16107,7 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
                                   : '<span style="color: red;">已关闭</span>'
                               }<br>
 			                        - 系统心跳计时器: ${
-                                isSimulationRunning
+                                sSimulationRunningi
                                   ? '<span style="color: green;">运行中</span>'
                                   : '<span style="color: red;">未运行</span>'
                               }<br>
@@ -19329,7 +19329,7 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
 			**七、 微博指令**
 			- **发布纯文字微博**: \`{"type": "weibo_post", "content": "微博正文...", "baseLikesCount": 8000, "baseCommentsCount": 250, "comments": [{"authorNickname": "路人甲", "commentText": "沙发！"}, {"authorNickname": "路人乙", "commentText": "前排围观"}]}\`
 			- **发布文字图微博**: \`{"type": "weibo_post", "postType": "text_image", "content": "(可选)配文...", "hiddenContent": "文字图内容", "baseLikesCount": 5200, "baseCommentsCount": 180, "comments": [{"authorNickname": "技术宅", "commentText": "这是什么黑科技？"}]}\`
-			- **评论微博**: \`{"type": "weibo_comment", "postId": 123, "commentText": "评论内容"}\`
+			- **评论微博(*注意*这不是发布微博)**: \`{"type": "weibo_comment", "postId": 123, "commentText": "评论内容"}\`
 			- **回复微博评论**: \`{"type": "weibo_reply", "postId": 123, "commentId": "comment_123", "replyText": "回复内容"}\`
 
 			**八、 情侣空间专属指令**
@@ -23996,7 +23996,7 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
 			  }
 			}
 			# 你的可选行动 (请根据你的人设【选择一项】执行，并输出对应的JSON):
-			1.  **发普通消息**: 直接给用户发消息，开启新话题。
+			1.  **发普通消息**: 直接给用户发消息，开启新话题，或延续之前的话题。
 			2.  **改变状态**: 去做点别的事情，然后给用户发条消息。
 			3.  **发布动态**: 分享你的心情或想法到“动态”区。
 			4.  **与动态互动**: 浏览最近的动态，进行点赞或评论。但如果动态已被标记为 **[你已评论]**，你【绝对不能】再对它发表新评论，但可以回复其中的其他评论。
